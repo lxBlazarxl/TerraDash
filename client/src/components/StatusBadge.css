@@ -1,0 +1,19 @@
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-label {
+  font-family: 'AndyBold', serif;
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: color var(--transition);
+}

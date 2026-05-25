@@ -1,0 +1,36 @@
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.biome-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  transition: background-image 1s ease-in-out;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 36px 40px;
+  background: transparent;
+  transition: background var(--transition);
+}
+
+.page {
+  max-width: 880px;
+}
+
+.page > h1 {
+  font-size: 2rem;
+  color: var(--accent);
+  margin-bottom: 28px;
+  transition: color var(--transition);
+}

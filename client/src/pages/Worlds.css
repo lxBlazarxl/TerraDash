@@ -1,0 +1,65 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  margin-bottom: 0;
+}
+
+.world-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.world-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.world-card-name {
+  font-family: 'AndyBold', serif;
+  font-size: 1.1rem;
+}
+
+.world-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.seed-label {
+  font-family: 'AndyBold', serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.seed-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.seed-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.seed-option input[type='checkbox'] {
+  width: auto;
+  accent-color: var(--accent);
+  cursor: pointer;
+}

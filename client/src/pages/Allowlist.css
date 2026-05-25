@@ -1,0 +1,97 @@
+.allowlist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.allowlist-row {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.allowlist-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.allowlist-row-header:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.player-name {
+  font-family: 'AndyBold', serif;
+  font-size: 1.05rem;
+}
+
+.row-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cmd-count {
+  font-size: 0.85rem;
+  opacity: 0.5;
+}
+
+.expand-chevron {
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+.allowlist-row-body {
+  border-top: 1px solid var(--border);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.command-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.command-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+}
+
+.command-tag button {
+  background: none;
+  color: #f87171;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  min-width: unset;
+}
+
+.no-commands {
+  font-size: 0.9rem;
+  opacity: 0.4;
+}
+
+.grant-row {
+  display: flex;
+  gap: 8px;
+}
+
+.grant-row input {
+  flex: 1;
+}

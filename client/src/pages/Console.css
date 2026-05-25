@@ -1,0 +1,65 @@
+.console-inputs {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.input-row label {
+  font-family: 'AndyBold', serif;
+  color: var(--accent);
+  min-width: 100px;
+  flex-shrink: 0;
+  transition: color var(--transition);
+}
+
+.input-row input {
+  flex: 1;
+}
+
+.console-log {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.log-entry {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.log-time {
+  opacity: 0.35;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.log-type {
+  color: var(--accent);
+  min-width: 52px;
+  flex-shrink: 0;
+  transition: color var(--transition);
+}
+
+.log-entry.fail .log-value {
+  color: #f87171;
+}
