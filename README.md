@@ -41,18 +41,18 @@ This project acts as a wrapper around the standalone Terraria server executable.
    ```bash
    # Production (recommended): installs/updates the Terraria server,
    # builds the client if needed, and serves the dashboard on PORT
-   npm start
+   ./start.sh
 
    # Development with hot reload
-   npm run dev
+   ./dev.sh
    ```
 
-   `npm start` accepts two flags for rare cases:
+   `start.sh` accepts two flags for rare cases:
    ```bash
-   npm start -- --force     # re-download the Terraria server
-   npm start -- --rebuild   # force a client rebuild
+   ./start.sh --force     # re-download the Terraria server
+   ./start.sh --rebuild   # force a client rebuild
    ```
-   To run the API server alone without the startup checks, use `npm run start:api`.
+   `npm start` / `npm run dev` invoke the same scripts, and `npm run start:api` runs the bare API without the startup checks.
 
 ## 3. Fetching / Updating the Terraria Server
 

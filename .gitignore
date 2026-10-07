@@ -10,3 +10,6 @@ terraria/
 # Runtime data - may contain player names, do not commit
 allowlist.json
 allowlist.json.tmp
+
+# Working notes, not for the repo
+UI_PROGRESS.md

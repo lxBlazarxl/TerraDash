@@ -5,9 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"node server.js\" \"vite client/\"",
+    "dev": "bash dev.sh",
     "build": "vite build client/",
-    "start": "node scripts/start.mjs",
+    "start": "bash start.sh",
     "start:api": "node server.js",
     "server:update": "node scripts/update-server.mjs",
     "test": "node --test --experimental-test-module-mocks tests/",
@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.1",
-    "concurrently": "^9.2.1",
     "vite": "^8.0.8",
     "vitepress": "^1.6.4"
   }
