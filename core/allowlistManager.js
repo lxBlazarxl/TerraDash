@@ -1,15 +1,32 @@
 import fs from "fs";
+import path from "path";
 
 let ALLOWLIST_PATH = "./allowlist.json";
 let allowlist = {};
 
 const save = () => {
   try {
-    fs.writeFileSync(ALLOWLIST_PATH, JSON.stringify(allowlist, null, 2));
+    const tmpPath = `${ALLOWLIST_PATH}.tmp`;
+    fs.writeFileSync(tmpPath, JSON.stringify(allowlist, null, 2));
+    fs.renameSync(tmpPath, ALLOWLIST_PATH);
   } catch (err) {
     console.error("[Allowlist] Failed to save:", err);
     throw err;
   }
+};
+
+const normalize = (parsed) => {
+  // Accept only a plain object mapping player -> array of command strings.
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return {};
+  }
+  const result = {};
+  for (const [player, commands] of Object.entries(parsed)) {
+    if (Array.isArray(commands)) {
+      result[player] = commands.filter((c) => typeof c === "string");
+    }
+  }
+  return result;
 };
 
 export const init = (filePath = "./allowlist.json") => {
@@ -17,8 +34,19 @@ export const init = (filePath = "./allowlist.json") => {
   if (!fs.existsSync(ALLOWLIST_PATH)) {
     allowlist = {};
     save();
-  } else {
-    allowlist = JSON.parse(fs.readFileSync(ALLOWLIST_PATH, "utf8"));
+    return;
+  }
+
+  try {
+    const raw = fs.readFileSync(ALLOWLIST_PATH, "utf8");
+    allowlist = normalize(JSON.parse(raw));
+  } catch (err) {
+    console.error(
+      `[Allowlist] Could not parse ${path.basename(ALLOWLIST_PATH)}; starting empty:`,
+      err.message,
+    );
+    allowlist = {};
+    save();
   }
 };
 

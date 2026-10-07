@@ -43,7 +43,12 @@ export default function Worlds() {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+    // Keep server state fresh so Load/Delete enablement tracks the backend.
+    const interval = setInterval(fetchData, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleSeed = (id) => {
     setForm(f => {
@@ -156,15 +161,26 @@ export default function Worlds() {
             <div className="world-card-actions">
               <button
                 onClick={() => loadWorld(i)}
-                disabled={serverState === 'ONLINE' || !!loading}
-                title={serverState === 'ONLINE' ? 'Cannot load while server is ONLINE' : ''}
+                disabled={serverState !== 'MENU' || !!loading}
+                title={
+                  serverState !== 'MENU'
+                    ? 'Start the server and leave it at the main menu to load a world'
+                    : ''
+                }
               >
                 {loading === `load-${i}` ? 'Loading...' : 'Load'}
               </button>
               <button
                 className="danger"
                 onClick={() => deleteWorld(world)}
-                disabled={!!loading}
+                disabled={
+                  (serverState !== 'OFFLINE' && serverState !== 'MENU') || !!loading
+                }
+                title={
+                  serverState !== 'OFFLINE' && serverState !== 'MENU'
+                    ? 'Stop the running world before deleting'
+                    : ''
+                }
               >
                 {loading === `delete-${world}` ? 'Deleting...' : 'Delete'}
               </button>

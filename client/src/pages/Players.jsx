@@ -11,6 +11,7 @@ export default function Players() {
     const fetchPlayers = async () => {
       try {
         const res = await fetch('/api/players');
+        if (!res.ok) throw new Error('Request failed');
         const data = await res.json();
         setPlayers(data.players || []);
       } catch {
@@ -18,13 +19,18 @@ export default function Players() {
       }
     };
     fetchPlayers();
+    const interval = setInterval(fetchPlayers, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const addToAllowlist = async (player) => {
     setLoading(player);
     setError(null);
     try {
-      await fetch(`/api/allowlist/${encodeURIComponent(player)}`, { method: 'POST' });
+      const res = await fetch(`/api/allowlist/${encodeURIComponent(player)}`, {
+        method: 'POST',
+      });
+      if (!res.ok) throw new Error('request failed');
       setAdded(prev => ({ ...prev, [player]: true }));
     } catch {
       setError(`Failed to add ${player} to allowlist.`);

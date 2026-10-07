@@ -16,8 +16,9 @@ export default function StatusBadge() {
     const poll = async () => {
       try {
         const res = await fetch('/api/status');
+        if (!res.ok) throw new Error('status request failed');
         const data = await res.json();
-        setState(data.state);
+        setState(data.state || 'OFFLINE');
       } catch {
         setState('OFFLINE');
       }

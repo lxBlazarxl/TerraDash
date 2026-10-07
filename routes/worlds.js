@@ -9,6 +9,22 @@ import {
 
 const router = express.Router();
 
+// Normalize user input and strip CR/LF so it cannot inject extra console lines.
+const clean = (value, max = 200) =>
+  String(value ?? "")
+    .replace(/[\r\n]+/g, " ")
+    .trim()
+    .slice(0, max);
+
+const cleanInt = (value, fallback, min, max) => {
+  const n = parseInt(value, 10);
+  if (Number.isNaN(n)) return fallback;
+  return Math.min(Math.max(n, min), max);
+};
+
+const oneOf = (value, allowed, fallback) =>
+  allowed.includes(String(value)) ? String(value) : fallback;
+
 router.get("/", (req, res) => {
   const result = listWorlds();
 
@@ -21,11 +37,11 @@ router.get("/", (req, res) => {
 
 router.post("/select", (req, res) => {
   const config = {
-    worldId: req.body.worldId || "1",
-    maxPlayers: req.body.maxPlayers || "16",
-    port: req.body.port || "7777",
-    upnp: req.body.upnp || "n",
-    password: req.body.password || "",
+    worldId: String(cleanInt(req.body.worldId, 1, 1, 9999)),
+    maxPlayers: String(cleanInt(req.body.maxPlayers, 16, 1, 255)),
+    port: String(cleanInt(req.body.port, 7777, 1, 65535)),
+    upnp: req.body.upnp === "y" ? "y" : "n",
+    password: clean(req.body.password, 128),
   };
 
   const result = selectWorld(config);
@@ -49,12 +65,16 @@ router.post("/exit", (req, res) => {
 
 router.post("/create", (req, res) => {
   const config = {
-    size: req.body.size || "1", // 1: Small, 2: Med, 3: Large
-    difficulty: req.body.difficulty || "1",
-    evil: req.body.evil || "1", // 1: Random, 2: Corrupt, 3: Crimson
-    name: req.body.name || "New_World",
-    seed: req.body.seed || "",
-    specialSeeds: req.body.specialSeeds || [],
+    size: oneOf(req.body.size, ["1", "2", "3"], "1"), // 1: Small, 2: Med, 3: Large
+    difficulty: oneOf(req.body.difficulty, ["1", "2", "3", "4"], "1"),
+    evil: oneOf(req.body.evil, ["1", "2", "3"], "1"), // 1: Random, 2: Corrupt, 3: Crimson
+    name: clean(req.body.name, 60) || "New_World",
+    seed: clean(req.body.seed, 60),
+    specialSeeds: Array.isArray(req.body.specialSeeds)
+      ? req.body.specialSeeds
+          .map((s) => parseInt(s, 10))
+          .filter((s) => Number.isInteger(s) && s >= 1 && s <= 10)
+      : [],
   };
 
   const result = createWorld(config);
@@ -67,7 +87,7 @@ router.post("/create", (req, res) => {
 });
 
 router.post("/delete", async (req, res) => {
-  const worldName = req.body.worldName;
+  const worldName = clean(req.body.worldName, 60);
 
   if (!worldName) {
     return res

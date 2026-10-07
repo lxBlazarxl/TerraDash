@@ -11,6 +11,7 @@ export default function Allowlist() {
   const fetchAllowlist = async () => {
     try {
       const res = await fetch('/api/allowlist');
+      if (!res.ok) throw new Error('request failed');
       const data = await res.json();
       setAllowlist(data.allowlist || {});
     } catch {
@@ -25,7 +26,10 @@ export default function Allowlist() {
     setLoading(`remove-${player}`);
     setError(null);
     try {
-      await fetch(`/api/allowlist/${encodeURIComponent(player)}`, { method: 'DELETE' });
+      const res = await fetch(`/api/allowlist/${encodeURIComponent(player)}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('request failed');
       if (expanded === player) setExpanded(null);
       fetchAllowlist();
     } catch {
@@ -41,10 +45,11 @@ export default function Allowlist() {
     setLoading(`grant-${player}`);
     setError(null);
     try {
-      await fetch(
+      const res = await fetch(
         `/api/allowlist/${encodeURIComponent(player)}/commands/${encodeURIComponent(command)}`,
         { method: 'POST' }
       );
+      if (!res.ok) throw new Error('request failed');
       setCommandInputs(prev => ({ ...prev, [player]: '' }));
       fetchAllowlist();
     } catch {
@@ -58,10 +63,11 @@ export default function Allowlist() {
     setLoading(`revoke-${player}-${command}`);
     setError(null);
     try {
-      await fetch(
+      const res = await fetch(
         `/api/allowlist/${encodeURIComponent(player)}/commands/${encodeURIComponent(command)}`,
         { method: 'DELETE' }
       );
+      if (!res.ok) throw new Error('request failed');
       fetchAllowlist();
     } catch {
       setError('Failed to revoke command.');

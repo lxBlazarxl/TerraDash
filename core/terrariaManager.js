@@ -1,11 +1,11 @@
 import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { createInterface } from "readline";
 import { checkPermission } from "./allowlistManager.js";
 
 let terrariaProcess = null;
 let bootConfig = null;
+let createConfig = null;
 
 export let serverState = "OFFLINE";
 export let activeWorld = null;
@@ -13,10 +13,25 @@ export let playerList = [];
 export let consoleLogs = [];
 
 const MAX_LOGS = 1000;
+const RESTART_TIMEOUT_MS = 15000;
 
-const TERRARIA_DIR = process.env.TERRARIA_DIR; 
-const TERRARIA_EXE = process.env.TERRARIA_EXE; 
-const WORLDS_DIR = path.join(TERRARIA_DIR, "Worlds");
+const TERRARIA_DIR = process.env.TERRARIA_DIR || "";
+const TERRARIA_EXE = process.env.TERRARIA_EXE || "";
+// Worlds may live outside the install dir (on Linux the dedicated server
+// defaults to ~/.local/share/Terraria/Worlds). Allow an explicit override.
+const WORLDS_DIR =
+  process.env.TERRARIA_WORLDS_DIR ||
+  (TERRARIA_DIR
+    ? path.join(TERRARIA_DIR, "Worlds")
+    : path.join(process.cwd(), "Worlds"));
+
+const isConfigured = () => Boolean(TERRARIA_DIR && TERRARIA_EXE);
+
+// Strip CR/LF so a caller cannot inject extra commands into the server stdin.
+const sanitizeCommand = (value) =>
+  String(value ?? "")
+    .replace(/[\r\n]+/g, " ")
+    .trim();
 
 const pushToConsole = (text) => {
   const lines = text.split("\n").filter((l) => l.trim().length > 0);
@@ -33,28 +48,43 @@ const pushToConsole = (text) => {
 
 export const getConsoleLogs = () => consoleLogs;
 
-export const getPlayerStats = () => {
-  return {
-    success: true,
-    count: playerList.length,
-    players: playerList,
-  };
-};
+export const getPlayerStats = () => ({
+  success: true,
+  count: playerList.length,
+  players: playerList,
+});
 
 export const startServer = () => {
   if (terrariaProcess) {
     return { success: false, message: "Server is already running." };
   }
 
+  if (!isConfigured()) {
+    return {
+      success: false,
+      message:
+        "TERRARIA_DIR and TERRARIA_EXE must be set in .env before starting the server.",
+    };
+  }
+
   console.log("[Manager] Booting Terraria Server...");
-  serverState = "MENU";
 
   const logStream = fs.createWriteStream("server.log", { flags: "a" });
-
   const exePath = path.join(TERRARIA_DIR, TERRARIA_EXE);
-  terrariaProcess = spawn(exePath, []);
 
-  terrariaProcess.stdout.on("data", (data) => {
+  let child;
+  try {
+    child = spawn(exePath, []);
+  } catch (err) {
+    console.error("[Manager] Failed to spawn server:", err);
+    logStream.end();
+    return { success: false, message: `Failed to spawn server: ${err.message}` };
+  }
+
+  terrariaProcess = child;
+  serverState = "MENU";
+
+  child.stdout.on("data", (data) => {
     const text = data.toString();
 
     logStream.write(data);
@@ -101,14 +131,14 @@ export const startServer = () => {
         const chatMatch = line.match(/^<(.+)> \/(\w+)$/);
         if (chatMatch) {
           const playerName = chatMatch[1].trim();
-          const command = chatMatch[2];
-          if (checkPermission(playerName, command)) {
+          const command = sanitizeCommand(chatMatch[2]);
+          if (command && checkPermission(playerName, command)) {
             console.log(`[Manager] ${playerName} ran /${command} via allowlist.`);
-            terrariaProcess.stdin.write(`${command}\n`);
-            terrariaProcess.stdin.write(`say ${playerName} ran ${command}\n`);
+            child.stdin.write(`${command}\n`);
+            child.stdin.write(`say ${playerName} ran ${command}\n`);
           } else {
-            console.log(`[Manager] ${playerName} denied /${command} — not on allowlist.`);
-            terrariaProcess.stdin.write(`say You don't have permission to run that.\n`);
+            console.log(`[Manager] ${playerName} denied /${command} - not on allowlist.`);
+            child.stdin.write(`say You don't have permission to run that.\n`);
           }
         }
       }
@@ -116,13 +146,13 @@ export const startServer = () => {
 
     if (bootConfig) {
       if (text.includes("Max players")) {
-        terrariaProcess.stdin.write(`${bootConfig.maxPlayers}\n`);
+        child.stdin.write(`${bootConfig.maxPlayers}\n`);
       } else if (text.includes("Server port")) {
-        terrariaProcess.stdin.write(`${bootConfig.port}\n`);
+        child.stdin.write(`${bootConfig.port}\n`);
       } else if (text.includes("Automatically forward port")) {
-        terrariaProcess.stdin.write(`${bootConfig.upnp}\n`);
+        child.stdin.write(`${bootConfig.upnp}\n`);
       } else if (text.includes("Server password")) {
-        terrariaProcess.stdin.write(`${bootConfig.password}\n`);
+        child.stdin.write(`${bootConfig.password}\n`);
       } else if (text.includes("Listening on port")) {
         console.log(
           `[Manager] Server fully online on port ${bootConfig.port}.`,
@@ -133,7 +163,7 @@ export const startServer = () => {
     }
 
     if (serverState === "CREATING" && createConfig) {
-      const reply = (val) => terrariaProcess.stdin.write(`${val}\n`);
+      const reply = (val) => child.stdin.write(`${val}\n`);
 
       if (text.includes("Choose size:")) {
         reply(createConfig.size || "1");
@@ -151,7 +181,7 @@ export const startServer = () => {
           const seedToToggle = createConfig.specialSeeds.shift();
           reply(seedToToggle);
         } else {
-          terrariaProcess.stdin.write("\n");
+          child.stdin.write("\n");
         }
       }
 
@@ -164,30 +194,40 @@ export const startServer = () => {
     }
   });
 
-  terrariaProcess.stderr.on("data", (data) => {
+  child.stderr.on("data", (data) => {
     const text = data.toString();
     logStream.write(`[STDERR] ${text}`);
     pushToConsole(`[ERR] ${text}`);
   });
 
-  terrariaProcess.on("close", (code) => {
-    console.log(`\n[Manager] Server shut down with code ${code}`);
-    logStream.write(`\n[Manager] Server shut down with code ${code}\n`);
-    logStream.end();
-
+  const resetState = () => {
     terrariaProcess = null;
     activeWorld = null;
     bootConfig = null;
     createConfig = null;
     playerList = [];
     serverState = "OFFLINE";
+  };
+
+  child.on("error", (err) => {
+    console.error("[Manager] Process error:", err);
+    logStream.write(`[Manager] Process error: ${err.message}\n`);
+    pushToConsole(`[ERR] ${err.message}`);
+    resetState();
+  });
+
+  child.on("close", (code) => {
+    console.log(`\n[Manager] Server shut down with code ${code}`);
+    logStream.write(`\n[Manager] Server shut down with code ${code}\n`);
+    logStream.end();
+    resetState();
   });
 
   return { success: true, message: "Server booted. Waiting at main menu." };
 };
 
 export const stopServer = () => {
-  if (serverState === "OFFLINE") {
+  if (serverState === "OFFLINE" || !terrariaProcess) {
     return { success: false, message: "Server is already offline." };
   }
 
@@ -208,8 +248,12 @@ export const selectWorld = (config) => {
     };
   }
 
+  if (!terrariaProcess) {
+    return { success: false, message: "Server process is not running." };
+  }
+
   const worldList = listWorlds();
-  const requestedId = parseInt(config.worldId);
+  const requestedId = parseInt(config.worldId, 10);
 
   if (
     isNaN(requestedId) ||
@@ -228,12 +272,12 @@ export const selectWorld = (config) => {
   serverState = "BOOTING";
   bootConfig = config;
 
-  terrariaProcess.stdin.write(`${config.worldId}\n`);
+  terrariaProcess.stdin.write(`${requestedId}\n`);
   return { success: true, message: `Booting ${activeWorld}...` };
 };
 
 export const exitWorld = () => {
-  if (serverState !== "ONLINE") {
+  if (serverState !== "ONLINE" || !terrariaProcess) {
     return {
       success: false,
       message: "Cannot exit. Server is not currently online.",
@@ -283,7 +327,7 @@ export const deleteWorld = async (worldName) => {
       message += " Server restarted to refresh the world list.";
     }
 
-    return { success: true, message: message };
+    return { success: true, message };
   } catch (error) {
     console.error("[Manager] Delete error:", error);
     return { success: false, message: "Failed to delete world files." };
@@ -296,12 +340,15 @@ export const listWorlds = () => {
 
     const worlds = files
       .filter((file) => file.endsWith(".wld"))
-      .map((file) => file.replace(".wld", ""));
+      .map((file) => file.replace(".wld", ""))
+      // TerrariaServer lists worlds alphabetically; match that order so the
+      // numeric index we send over stdin maps to the world the user clicked.
+      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 
-    return { success: true, worlds: worlds };
+    return { success: true, worlds };
   } catch (error) {
     console.error("[Manager] Error reading worlds directory:", error);
-    return { success: false, message: "Failed to read worlds directory." };
+    return { success: false, worlds: [], message: "Failed to read worlds directory." };
   }
 };
 
@@ -315,21 +362,26 @@ export const restartServer = async () => {
   stopServer();
 
   return new Promise((resolve) => {
+    const startedAt = Date.now();
     const checkInterval = setInterval(() => {
       if (!terrariaProcess) {
         clearInterval(checkInterval);
         console.log("[Manager] Server stopped. Re-booting now...");
-        const result = startServer();
-        resolve(result);
+        resolve(startServer());
+      } else if (Date.now() - startedAt > RESTART_TIMEOUT_MS) {
+        clearInterval(checkInterval);
+        console.error("[Manager] Restart timed out waiting for shutdown.");
+        resolve({
+          success: false,
+          message: "Restart timed out waiting for the server to stop.",
+        });
       }
     }, 100);
   });
 };
 
-let createConfig = null;
-
 export const createWorld = (config) => {
-  if (serverState !== "MENU") {
+  if (serverState !== "MENU" || !terrariaProcess) {
     return {
       success: false,
       message: "Must be at the main menu to create a world.",
@@ -354,20 +406,24 @@ export const sendCommand = (command, sayCommand) => {
     };
   }
 
-  if (command) {
-    console.log(`[Manager] Injecting command: ${command}`);
-    terrariaProcess.stdin.write(`${command}\n`);
+  const cmd = sanitizeCommand(command);
+  const say = sanitizeCommand(sayCommand);
+
+  if (!cmd && !say) {
+    return { success: false, message: "No valid instruction provided." };
   }
 
-  if (sayCommand) {
-    console.log(`[Manager] Broadcasting: ${sayCommand}`);
-    terrariaProcess.stdin.write(`say ${sayCommand}\n`);
+  if (cmd) {
+    console.log(`[Manager] Injecting command: ${cmd}`);
+    terrariaProcess.stdin.write(`${cmd}\n`);
   }
 
-  return {
-    success: true,
-    message: "Instruction(s) sent to server.",
-  };
+  if (say) {
+    console.log(`[Manager] Broadcasting: ${say}`);
+    terrariaProcess.stdin.write(`say ${say}\n`);
+  }
+
+  return { success: true, message: "Instruction(s) sent to server." };
 };
 
 export const getProcess = () => terrariaProcess;
