@@ -29,13 +29,25 @@
   flex: 1;
 }
 
+.console-log-note {
+  margin-bottom: var(--space-3);
+  color: var(--text-dim);
+  font-size: var(--text-sm);
+}
+
 .console-log {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  max-height: min(52vh, 480px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-anchor: none;
+  margin-bottom: var(--space-5);
 }
 
 .log-entry {
+  flex-shrink: 0;
   display: flex;
   align-items: baseline;
   gap: var(--space-3);

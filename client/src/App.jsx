@@ -20,7 +20,7 @@ function ThemeSync() {
 
 function BackgroundLayer() {
   return (
-    <div className="biome-bg" style={{ backgroundImage: 'var(--bg-image)' }} />
+    <div className="biome-bg" aria-hidden="true" />
   );
 }
 

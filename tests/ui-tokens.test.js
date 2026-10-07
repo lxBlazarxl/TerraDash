@@ -72,7 +72,6 @@ test("every custom property referenced in CSS is defined", () => {
 test("every token defined in :root is actually used or intentionally reserved", () => {
   // Declared up front as part of the token contract, consumed by later phases.
   const reserved = new Map([
-    ["--bg-image", "set at runtime by theme.js per route"],
     ["--state-online", "read from JS via getComputedStyle (stateColors.js)"],
     ["--state-offline", "read from JS via getComputedStyle (stateColors.js)"],
     ["--state-booting", "read from JS via getComputedStyle (stateColors.js)"],
@@ -111,7 +110,6 @@ test("each theme defines the full biome token contract", () => {
     "--accent",
     "--accent-glow",
     "--signature",
-    "--bg-image",
   ];
 
   assert.deepEqual(Object.keys(themes).sort(), ["allowlist", "console", "home", "players", "worlds"]);
@@ -130,9 +128,6 @@ test("the :root bootstrap fallback mirrors themes.home", () => {
   );
 
   for (const [token, value] of Object.entries(home)) {
-    // --bg-image is deliberately `none` before JS boots: the bootstrap must not
-    // trigger a remote image fetch; theme.js supplies it per route at runtime.
-    if (token === "--bg-image") continue;
     assert.equal(
       rootValues[token],
       value,
@@ -140,8 +135,6 @@ test("the :root bootstrap fallback mirrors themes.home", () => {
         "index.css bootstrap colors must mirror client/src/theme.js themes.home.",
     );
   }
-
-  assert.equal(rootValues["--bg-image"], "none", "bootstrap --bg-image must stay `none`");
 });
 
 test("no theme leaks an undefined var() into its own values", () => {

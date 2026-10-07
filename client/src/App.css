@@ -9,9 +9,13 @@
   inset: 0;
   z-index: var(--z-bg);
   background-color: var(--bg);
-  background-image: var(--bg-image);
-  background-size: cover;
-  background-position: center;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse at 35% 15%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+    radial-gradient(ellipse at 90% 85%, color-mix(in srgb, var(--signature) 15%, transparent), transparent 55%),
+    linear-gradient(color-mix(in srgb, var(--text) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--text) 3%, transparent) 1px, transparent 1px);
+  background-size: auto, auto, 32px 32px, 32px 32px;
   transition: background-color var(--dur-slow) var(--ease-in-out);
 }
 

@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import './Console.css';
+
+const LOG_LIMIT = 20;
 
 export default function Console() {
   const [command, setCommand] = useState('');
@@ -7,14 +9,22 @@ export default function Console() {
   const [serverLogs, setServerLogs] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(null);
-  const logEndRef = useRef(null);
+  const logContainerRef = useRef(null);
+  const followLogsRef = useRef(true);
 
   const fetchLogs = async () => {
     try {
       const res = await fetch('/api/status/logs');
       const data = await res.json();
       if (data.success) {
-        setServerLogs(data.logs);
+        const recentLogs = data.logs.slice(-LOG_LIMIT);
+        setServerLogs(previous => {
+          const unchanged = previous.length === recentLogs.length &&
+            previous.every((entry, i) =>
+              entry.time === recentLogs[i].time && entry.content === recentLogs[i].content
+            );
+          return unchanged ? previous : recentLogs;
+        });
       }
     } catch {
       console.error('Failed to fetch logs');
@@ -27,11 +37,18 @@ export default function Console() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (logEndRef.current) {
-      logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  useLayoutEffect(() => {
+    const container = logContainerRef.current;
+    if (container && followLogsRef.current) {
+      container.scrollTop = container.scrollHeight;
     }
   }, [serverLogs]);
+
+  const handleLogScroll = () => {
+    const container = logContainerRef.current;
+    followLogsRef.current =
+      container.scrollHeight - container.scrollTop - container.clientHeight <= 4;
+  };
 
   const send = async (type) => {
     const value = type === 'command' ? command.trim() : sayText.trim();
@@ -67,7 +84,15 @@ export default function Console() {
       <h1>Console</h1>
       {error && <div className="error-msg">{error}</div>}
 
-      <div className="console-log">
+      <p className="console-log-note">Latest 20 log entries. Scroll up to pause auto-scroll; return to the bottom to resume.</p>
+      <div
+        className="console-log"
+        ref={logContainerRef}
+        onScroll={handleLogScroll}
+        tabIndex={0}
+        role="region"
+        aria-label="Recent server logs"
+      >
         {serverLogs.length === 0 && (
           <div className="empty">No logs available. Start the server to see output.</div>
         )}
@@ -80,7 +105,6 @@ export default function Console() {
             <span className="log-value">{entry.content}</span>
           </div>
         ))}
-        <div ref={logEndRef} />
       </div>
 
       <div className="console-inputs">

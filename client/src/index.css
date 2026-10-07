@@ -4,9 +4,9 @@
    Token contract
      - Biome colors (overridden per route by client/src/theme.js):
          --bg  --panel  --text  --border  --accent  --accent-glow
-         --signature  --bg-image
+         --signature
      - Everything else is DERIVED here from the biome colors or is a fixed
-       structural token, so a theme only has to supply 8 values.
+       structural token, so a theme only has to supply 7 values.
      The :root biome values below are a bootstrap fallback mirroring
      themes.home in theme.js; tests/ui-tokens.test.js fails if they drift.
    ========================================================================= */
@@ -28,17 +28,15 @@
   --accent: #7CFF7C;
   --accent-glow: rgba(124, 255, 124, 0.3);
   --signature: #5c8a2e;
-  --bg-image: none;
 
   /* --- Surfaces (derived) -------------------------------------------------- */
-  /* White sheen over a dark scrim tinted from --bg, so glass panels stay
-     legible on top of bright biome artwork. Re-derives per theme. */
+  /* Subtle sheen over a mostly solid biome panel. Re-derives per theme. */
   --surface-1:
     linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--bg) 78%, transparent),
-      color-mix(in srgb, var(--bg) 62%, transparent)
+      color-mix(in srgb, var(--panel) 94%, transparent),
+      color-mix(in srgb, var(--bg) 90%, transparent)
     );
   --surface-2: var(--panel);
   --surface-hover: color-mix(in srgb, var(--text) 6%, transparent);
