@@ -5,6 +5,7 @@ dist/
 client/dist/
 client/node_modules/
 .DS_Store
+terraria/
 
 # Runtime data - may contain player names, do not commit
 allowlist.json

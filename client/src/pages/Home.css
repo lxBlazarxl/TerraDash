@@ -1,26 +1,45 @@
 .status-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 40px;
-  margin-bottom: 28px;
+  padding: var(--space-9) var(--space-6);
+  margin-bottom: var(--space-7);
   text-align: center;
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
 }
 
 .big-status {
-  font-family: 'AndyBold', serif;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-display);
   font-size: 3.5rem;
-  margin-bottom: 10px;
-  transition: color 0.3s;
+  line-height: 1.1;
+  transition: color var(--dur-base) var(--ease-in-out);
 }
 
 .active-world {
-  font-size: 1rem;
-  opacity: 0.65;
+  font-size: var(--text-base);
+  color: var(--text-dim);
+}
+
+.version-note {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-dim);
 }
 
 .home-actions {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.update-btn {
+  color: var(--ok);
+  background: var(--ok-soft);
+  border-color: var(--ok-border);
+}
+
+.update-btn:hover:not(:disabled) {
+  background: var(--ok);
+  color: #000;
+  box-shadow: 0 0 20px var(--ok-soft);
 }

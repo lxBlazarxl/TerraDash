@@ -3,7 +3,10 @@ import {
   startServer,
   stopServer,
   restartServer,
+  serverState,
 } from "../core/terrariaManager.js";
+import { updateServer, isUpdating } from "../core/serverUpdater.js";
+import { checkVersion } from "../core/versionChecker.js";
 
 const router = express.Router();
 
@@ -31,6 +34,41 @@ router.post("/restart", async (req, res) => {
     res.json(result);
   } else {
     res.status(500).json(result);
+  }
+});
+
+router.post("/update", async (req, res) => {
+  if (isUpdating()) {
+    return res
+      .status(409)
+      .json({ success: false, message: "An update is already in progress." });
+  }
+
+  const wasRunning = serverState !== "OFFLINE";
+
+  try {
+    const result = await updateServer();
+
+    if (!result.success) {
+      return res.status(500).json(result);
+    }
+
+    if (result.updated) {
+      await checkVersion();
+
+      if (wasRunning) {
+        const restart = await restartServer();
+        return res.json({
+          ...result,
+          restarted: restart.success,
+          message: `${result.message} Server restarted.`,
+        });
+      }
+    }
+
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 

@@ -72,7 +72,10 @@ export default function Console() {
           <div className="empty">No logs available. Start the server to see output.</div>
         )}
         {serverLogs.map((entry, i) => (
-          <div className="log-entry" key={i}>
+          <div
+            className={`log-entry${entry.content.startsWith('[ERR]') ? ' err' : ''}`}
+            key={i}
+          >
             <span className="log-time">{entry.time}</span>
             <span className="log-value">{entry.content}</span>
           </div>

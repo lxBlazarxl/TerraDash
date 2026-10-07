@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
+import { getStateColor } from '../stateColors';
 import './StatusBadge.css';
-
-const stateColors = {
-  ONLINE: '#5c8a2e',
-  OFFLINE: '#6b2020',
-  BOOTING: '#8b6914',
-  CREATING: '#8b6914',
-  MENU: '#2a5a8b',
-};
 
 export default function StatusBadge() {
   const [state, setState] = useState('OFFLINE');
@@ -28,12 +21,11 @@ export default function StatusBadge() {
     return () => clearInterval(id);
   }, []);
 
+  const color = getStateColor(state);
+
   return (
     <div className="status-badge">
-      <span
-        className="status-dot"
-        style={{ background: stateColors[state] || '#555' }}
-      />
+      <span className="status-dot" style={{ background: color, color }} />
       <span className="status-label">{state}</span>
     </div>
   );

@@ -1,26 +1,147 @@
+/* ============================================================================
+   TerraDash design tokens + base layer
+   ----------------------------------------------------------------------------
+   Token contract
+     - Biome colors (overridden per route by client/src/theme.js):
+         --bg  --panel  --text  --border  --accent  --accent-glow
+         --signature  --bg-image
+     - Everything else is DERIVED here from the biome colors or is a fixed
+       structural token, so a theme only has to supply 8 values.
+     The :root biome values below are a bootstrap fallback mirroring
+     themes.home in theme.js; tests/ui-tokens.test.js fails if they drift.
+   ========================================================================= */
+
 @font-face {
   font-family: 'AndyBold';
   src: url('/fonts/Andy Bold.ttf') format('truetype');
-  font-weight: bold;
-}
-
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 :root {
+  /* --- Biome colors: bootstrap fallback (mirrors themes.home) --------------- */
   --bg: #0d1f0d;
   --panel: #1a3a1a;
-  --accent: #5c8a2e;
   --text: #e8d5a3;
   --border: #2d5a1a;
-  --transition: 0.3s ease;
+  --accent: #7CFF7C;
+  --accent-glow: rgba(124, 255, 124, 0.3);
+  --signature: #5c8a2e;
+  --bg-image: none;
+
+  /* --- Surfaces (derived) -------------------------------------------------- */
+  /* White sheen over a dark scrim tinted from --bg, so glass panels stay
+     legible on top of bright biome artwork. Re-derives per theme. */
+  --surface-1:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg) 78%, transparent),
+      color-mix(in srgb, var(--bg) 62%, transparent)
+    );
+  --surface-2: var(--panel);
+  --surface-hover: color-mix(in srgb, var(--text) 6%, transparent);
+  --surface-active: color-mix(in srgb, var(--accent) 12%, transparent);
+  --surface-blur: 24px;
+  --overlay: color-mix(in srgb, var(--bg) 74%, transparent);
+  --border-subtle: color-mix(in srgb, var(--text) 12%, transparent);
+  --border-strong: var(--border);
+
+  /* --- Text roles (derived) ------------------------------------------------ */
+  --text-strong: #ffffff;
+  --text-dim: color-mix(in srgb, var(--text) 62%, transparent);
+  --text-faint: color-mix(in srgb, var(--text) 38%, transparent);
+
+  /* --- Semantic colors (fixed: meaning must not change per biome) ---------- */
+  --ok: #5fd35f;
+  --ok-soft: rgba(95, 211, 95, 0.15);
+  --ok-border: rgba(95, 211, 95, 0.4);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.15);
+  --warn-border: rgba(251, 191, 36, 0.4);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.15);
+  --danger-border: rgba(248, 113, 113, 0.45);
+  --danger-glow: rgba(248, 113, 113, 0.4);
+
+  /* --- Server state colors (single source for JS + CSS) -------------------- */
+  --state-online: #5fd35f;
+  --state-offline: #f87171;
+  --state-booting: #fbbf24;
+  --state-creating: #fbbf24;
+  --state-menu: #60a5fa;
+
+  /* --- Spacing scale ------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+
+  /* --- Radii --------------------------------------------------------------- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* --- Elevation ----------------------------------------------------------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.37);
+  --shadow-glow: 0 0 20px var(--accent-glow);
+
+  /* --- Layering ------------------------------------------------------------ */
+  --z-bg: -1;
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-drawer: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+
+  /* --- Typography ---------------------------------------------------------- */
+  --font-display: 'AndyBold', 'Trebuchet MS', sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SFMono-Regular', 'Menlo', 'Consolas', 'Courier New', monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.85rem;
+  --text-base: 0.95rem;
+  --text-md: 1.05rem;
+  --text-lg: 1.1rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 2rem;
+
+  /* --- Motion -------------------------------------------------------------- */
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: ease-in-out;
+
+  color-scheme: dark;
 }
 
-html, body, #root {
+/* --- Reset ---------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
   height: 100%;
 }
 
@@ -29,32 +150,104 @@ body {
   background-attachment: fixed;
   min-height: 100vh;
   color: var(--text);
-  font-family: system-ui, -apple-system, sans-serif;
-  transition: background var(--transition), color var(--transition);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
   overflow: hidden;
+  transition: background var(--dur-base) var(--ease-in-out), color var(--dur-base) var(--ease-in-out);
 }
 
-h1, h2, h3 {
-  font-family: 'AndyBold', serif;
+/* Scoped theme transitions: only elements that read biome colors animate. */
+h1,
+h2,
+h3,
+button,
+input,
+select,
+textarea,
+a {
+  transition:
+    background-color var(--dur-base) var(--ease-in-out),
+    border-color var(--dur-base) var(--ease-in-out),
+    color var(--dur-base) var(--ease-in-out),
+    box-shadow var(--dur-base) var(--ease-in-out);
 }
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--accent);
+}
+
+/* Keyboard focus only, so mouse clicks stay quiet. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- Surfaces -------------------------------------------------------------
+   .surface        translucent glass over the biome backdrop (page panels)
+   .surface--flat  opaque biome panel (cards, rows, composer, modal body)
+   -------------------------------------------------------------------------- */
+
+.surface {
+  position: relative;
+  padding: var(--space-6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--surface-blur)) saturate(160%);
+  box-shadow: var(--shadow-lg);
+  transition:
+    background var(--dur-base) var(--ease-in-out),
+    border-color var(--dur-base) var(--ease-in-out);
+}
+
+.surface--flat {
+  padding: var(--space-4) var(--space-5);
+  border-color: var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  backdrop-filter: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Controls ------------------------------------------------------------- */
 
 button {
-  font-family: 'AndyBold', serif;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 400;
   color: var(--accent);
-  backdrop-filter: blur(4px);
-  padding: 8px 18px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-5);
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.3s;
-  font-size: 0.95rem;
+  backdrop-filter: blur(4px);
+  transition:
+    background-color var(--dur-base) var(--ease-in-out),
+    border-color var(--dur-base) var(--ease-in-out),
+    color var(--dur-base) var(--ease-in-out),
+    box-shadow var(--dur-base) var(--ease-in-out),
+    opacity var(--dur-fast) var(--ease-in-out);
 }
 
 button:hover:not(:disabled) {
   background: var(--accent);
-  color: #000;
-  box-shadow: 0 0 20px var(--accent-glow);
+  color: var(--bg);
+  box-shadow: var(--shadow-glow);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 button:disabled {
@@ -63,72 +256,93 @@ button:disabled {
 }
 
 button.danger {
-  border-color: #ff4d4d;
-  color: #ff4d4d;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
 }
 
 button.danger:hover:not(:disabled) {
-  background: #ff4d4d;
+  background: var(--danger);
   color: #000;
-  box-shadow: 0 0 20px rgba(255, 77, 77, 0.4);
+  box-shadow: 0 0 20px var(--danger-glow);
 }
 
-input, select, textarea {
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-family: system-ui, sans-serif;
-  font-size: 0.95rem;
+button.ghost {
+  background: transparent;
+  border-color: var(--border-subtle);
+  color: var(--text-dim);
+}
+
+button.ghost:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: none;
+}
+
+input,
+select,
+textarea {
   width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  transition:
+    border-color var(--dur-base) var(--ease-in-out),
+    background-color var(--dur-base) var(--ease-in-out),
+    box-shadow var(--dur-base) var(--ease-in-out);
 }
 
-input:focus, select:focus {
-  outline: 1px solid var(--accent);
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-faint);
 }
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+input[type='checkbox'] {
+  width: auto;
+  accent-color: var(--accent);
+}
+
+/* --- Messages ------------------------------------------------------------- */
 
 .error-msg {
-  background: #3a1a1a;
-  border: 1px solid #8b1a1a;
-  color: #f87171;
-  padding: 10px 16px;
-  border-radius: 4px;
-  margin-bottom: 16px;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-md);
+}
+
+.notice-msg {
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  color: var(--ok);
+  background: var(--ok-soft);
+  border: 1px solid var(--ok-border);
+  border-radius: var(--radius-md);
 }
 
 .empty {
-  color: var(--text);
-  opacity: 0.45;
+  padding: var(--space-8) var(--space-5);
+  color: var(--text-dim);
   text-align: center;
-  padding: 48px 0;
-  font-size: 1rem;
-}
-
-.glass-panel {
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(24px) saturate(160%);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  padding: 24px;
-}
-
-.glass-panel::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: var(--bg-image);
-  background-size: cover;
-  background-position: center;
-  opacity: 0.05;
-  pointer-events: none;
-  z-index: -1;
+  font-size: var(--text-base);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(8px);
 }
 
 .mana-glow {

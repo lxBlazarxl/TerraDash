@@ -8,7 +8,8 @@
     "dev": "concurrently \"node server.js\" \"vite client/\"",
     "build": "vite build client/",
     "start": "node server.js",
-    "test": "node --test tests/allowlistManager.test.js",
+    "server:update": "node scripts/update-server.mjs",
+    "test": "node --test --experimental-test-module-mocks tests/",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"

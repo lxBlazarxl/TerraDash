@@ -1,27 +1,28 @@
 .console-inputs {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  transition: background var(--transition), border-color var(--transition);
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: background var(--dur-base) var(--ease-in-out);
 }
 
 .input-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .input-row label {
-  font-family: 'AndyBold', serif;
-  color: var(--accent);
-  min-width: 100px;
   flex-shrink: 0;
-  transition: color var(--transition);
+  min-width: 100px;
+  font-family: var(--font-display);
+  color: var(--accent);
+  transition: color var(--dur-base) var(--ease-in-out);
 }
 
 .input-row input {
@@ -31,35 +32,38 @@
 .console-log {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-1);
 }
 
 .log-entry {
   display: flex;
-  gap: 14px;
   align-items: baseline;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 8px 14px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-  transition: background var(--transition), border-color var(--transition);
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: background var(--dur-base) var(--ease-in-out);
+}
+
+.log-entry:hover {
+  border-color: var(--border-strong);
 }
 
 .log-time {
-  opacity: 0.35;
+  flex-shrink: 0;
   min-width: 80px;
-  flex-shrink: 0;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
 }
 
-.log-type {
-  color: var(--accent);
-  min-width: 52px;
-  flex-shrink: 0;
-  transition: color var(--transition);
+.log-value {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.log-entry.fail .log-value {
-  color: #f87171;
+.log-entry.err .log-value {
+  color: var(--danger);
 }

@@ -1,4 +1,13 @@
 // client/src/theme.js
+//
+// Biome themes. Each theme supplies ONLY these 8 custom properties; every other
+// token (surfaces, text roles, borders, motion, spacing) is derived from them in
+// index.css, so adding a biome means adding one entry here.
+//
+//   --bg  --panel  --text  --border  --accent  --accent-glow  --signature  --bg-image
+//
+// index.css :root mirrors themes.home as a pre-paint bootstrap fallback;
+// tests/ui-tokens.test.js fails if the two ever drift apart.
 export const themes = {
   home: {
     '--bg-image': 'url("https://cdn.akamai.steamstatic.com/steamcommunity/public/images/items/105600/b075f005440eebb33364c6c409fbde9d7f496499.jpg")',

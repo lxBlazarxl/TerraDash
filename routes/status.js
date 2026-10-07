@@ -4,6 +4,7 @@ import {
   activeWorld,
   getConsoleLogs,
 } from "../core/terrariaManager.js";
+import { getVersionStatus } from "../core/versionChecker.js";
 
 const router = express.Router();
 
@@ -12,6 +13,7 @@ router.get("/", (req, res) => {
     success: true,
     world: activeWorld,
     state: serverState,
+    serverVersion: getVersionStatus(),
   });
 });
 

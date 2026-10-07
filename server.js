@@ -9,11 +9,13 @@ import commandRoutes from "./routes/commands.js";
 import playerRoutes from "./routes/players.js";
 import allowlistRoutes from "./routes/allowlist.js";
 import { init as initAllowlist } from "./core/allowlistManager.js";
+import { checkVersion } from "./core/versionChecker.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 initAllowlist();
+checkVersion();
 
 const app = express();
 app.use(express.json());
@@ -41,7 +43,7 @@ app.use("/api/allowlist", allowlistRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(join(__dirname, "dist")));
-  app.get("*", (req, res) => {
+  app.get('/{*splat}', (req, res) => {
     res.sendFile(join(__dirname, "dist", "index.html"));
   });
 }
