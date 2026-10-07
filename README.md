@@ -24,12 +24,9 @@ This project acts as a wrapper around the standalone Terraria server executable.
 
 2. **Install dependencies**:
    ```bash
-   # Install backend dependencies
    npm install
-
-   # Install frontend dependencies
-   cd client && npm install && cd ..
    ```
+   (The client is bundled by the root Vite install; no separate client install is needed.)
 
 3. **Configure Environment Variables**:
    Copy `.env.example` to `.env` and update the paths:
@@ -42,9 +39,20 @@ This project acts as a wrapper around the standalone Terraria server executable.
 
 4. **Run the Application**:
    ```bash
-   # Start the development server
+   # Production (recommended): installs/updates the Terraria server,
+   # builds the client if needed, and serves the dashboard on PORT
+   npm start
+
+   # Development with hot reload
    npm run dev
    ```
+
+   `npm start` accepts two flags for rare cases:
+   ```bash
+   npm start -- --force     # re-download the Terraria server
+   npm start -- --rebuild   # force a client rebuild
+   ```
+   To run the API server alone without the startup checks, use `npm run start:api`.
 
 ## 3. Fetching / Updating the Terraria Server
 
