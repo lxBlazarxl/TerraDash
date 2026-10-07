@@ -7,7 +7,6 @@
   justify-content: center;
   padding: var(--space-4);
   background: var(--overlay);
-  backdrop-filter: blur(6px);
   animation: overlay-in var(--dur-base) var(--ease-out);
 }
 
@@ -49,7 +48,6 @@
   color: var(--text-dim);
   background: transparent;
   border-color: transparent;
-  backdrop-filter: none;
 }
 
 .modal-close:hover:not(:disabled) {

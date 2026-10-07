@@ -6,11 +6,11 @@
 // StatusBadge.jsx.
 
 const FALLBACK = {
-  ONLINE: '#5fd35f',
-  OFFLINE: '#f87171',
-  BOOTING: '#fbbf24',
-  CREATING: '#fbbf24',
-  MENU: '#60a5fa',
+  ONLINE: '#ffffff',
+  OFFLINE: '#909090',
+  BOOTING: '#d4d4d4',
+  CREATING: '#d4d4d4',
+  MENU: '#b0b0b0',
 };
 
 const cache = new Map();

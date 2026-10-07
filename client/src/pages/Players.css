@@ -14,7 +14,7 @@
   font-size: var(--text-base);
   color: var(--accent);
   text-align: left;
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  background: var(--surface-hover);
   border-bottom: 1px solid var(--border-strong);
   transition: color var(--dur-base) var(--ease-in-out);
 }

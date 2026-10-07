@@ -2,12 +2,10 @@
    TerraDash design tokens + base layer
    ----------------------------------------------------------------------------
    Token contract
-     - Biome colors (overridden per route by client/src/theme.js):
-         --bg  --panel  --text  --border  --accent  --accent-glow
-         --signature
-     - Everything else is DERIVED here from the biome colors or is a fixed
-       structural token, so a theme only has to supply 7 values.
-     The :root biome values below are a bootstrap fallback mirroring
+      - Monochrome palette shared by all routes in client/src/theme.js:
+         --bg  --panel  --text  --border  --accent
+      - Solid surfaces and grayscale states are defined below.
+      The :root palette values below are a bootstrap fallback mirroring
      themes.home in theme.js; tests/ui-tokens.test.js fails if they drift.
    ========================================================================= */
 
@@ -20,55 +18,44 @@
 }
 
 :root {
-  /* --- Biome colors: bootstrap fallback (mirrors themes.home) --------------- */
-  --bg: #0d1f0d;
-  --panel: #1a3a1a;
-  --text: #e8d5a3;
-  --border: #2d5a1a;
-  --accent: #7CFF7C;
-  --accent-glow: rgba(124, 255, 124, 0.3);
-  --signature: #5c8a2e;
+  /* --- Monochrome palette: bootstrap fallback (mirrors themes.home) --------- */
+  --bg: #0a0a0a;
+  --panel: #141414;
+  --text: #e5e5e5;
+  --border: #404040;
+  --accent: #ffffff;
 
-  /* --- Surfaces (derived) -------------------------------------------------- */
-  /* Subtle sheen over a mostly solid biome panel. Re-derives per theme. */
-  --surface-1:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--panel) 94%, transparent),
-      color-mix(in srgb, var(--bg) 90%, transparent)
-    );
+  /* --- Solid surfaces ----------------------------------------------------- */
+  --surface-1: var(--panel);
   --surface-2: var(--panel);
-  --surface-hover: color-mix(in srgb, var(--text) 6%, transparent);
-  --surface-active: color-mix(in srgb, var(--accent) 12%, transparent);
-  --surface-blur: 24px;
-  --overlay: color-mix(in srgb, var(--bg) 74%, transparent);
-  --border-subtle: color-mix(in srgb, var(--text) 12%, transparent);
+  --surface-hover: #202020;
+  --surface-active: #292929;
+  --overlay: rgba(0, 0, 0, 0.8);
+  --border-subtle: #303030;
   --border-strong: var(--border);
 
-  /* --- Text roles (derived) ------------------------------------------------ */
+  /* --- Text roles --------------------------------------------------------- */
   --text-strong: #ffffff;
-  --text-dim: color-mix(in srgb, var(--text) 62%, transparent);
-  --text-faint: color-mix(in srgb, var(--text) 38%, transparent);
+  --text-dim: #b0b0b0;
+  --text-faint: #909090;
 
-  /* --- Semantic colors (fixed: meaning must not change per biome) ---------- */
-  --ok: #5fd35f;
-  --ok-soft: rgba(95, 211, 95, 0.15);
-  --ok-border: rgba(95, 211, 95, 0.4);
-  --warn: #fbbf24;
-  --warn-soft: rgba(251, 191, 36, 0.15);
-  --warn-border: rgba(251, 191, 36, 0.4);
-  --danger: #f87171;
-  --danger-soft: rgba(248, 113, 113, 0.15);
-  --danger-border: rgba(248, 113, 113, 0.45);
-  --danger-glow: rgba(248, 113, 113, 0.4);
+  /* --- Grayscale feedback (labels communicate meaning) -------------------- */
+  --ok: #ffffff;
+  --ok-soft: #202020;
+  --ok-border: #707070;
+  --warn: #d4d4d4;
+  --warn-soft: #202020;
+  --warn-border: #606060;
+  --danger: #ffffff;
+  --danger-soft: #202020;
+  --danger-border: #909090;
 
   /* --- Server state colors (single source for JS + CSS) -------------------- */
-  --state-online: #5fd35f;
-  --state-offline: #f87171;
-  --state-booting: #fbbf24;
-  --state-creating: #fbbf24;
-  --state-menu: #60a5fa;
+  --state-online: #ffffff;
+  --state-offline: #909090;
+  --state-booting: #d4d4d4;
+  --state-creating: #d4d4d4;
+  --state-menu: #b0b0b0;
 
   /* --- Spacing scale ------------------------------------------------------- */
   --space-1: 4px;
@@ -89,10 +76,9 @@
   --radius-pill: 999px;
 
   /* --- Elevation ----------------------------------------------------------- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.37);
-  --shadow-glow: 0 0 20px var(--accent-glow);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
 
   /* --- Layering ------------------------------------------------------------ */
   --z-bg: -1;
@@ -187,8 +173,8 @@ h3 {
 }
 
 /* --- Surfaces -------------------------------------------------------------
-   .surface        translucent glass over the biome backdrop (page panels)
-   .surface--flat  opaque biome panel (cards, rows, composer, modal body)
+   .surface        solid page panels
+   .surface--flat  compact cards, rows, composer, and modal body
    -------------------------------------------------------------------------- */
 
 .surface {
@@ -197,7 +183,6 @@ h3 {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   background: var(--surface-1);
-  backdrop-filter: blur(var(--surface-blur)) saturate(160%);
   box-shadow: var(--shadow-lg);
   transition:
     background var(--dur-base) var(--ease-in-out),
@@ -209,7 +194,6 @@ h3 {
   border-color: var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--surface-2);
-  backdrop-filter: none;
   box-shadow: var(--shadow-sm);
 }
 
@@ -224,12 +208,11 @@ button {
   font-size: var(--text-base);
   font-weight: 400;
   color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  background: var(--surface-2);
   border: 1px solid var(--accent);
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-5);
   cursor: pointer;
-  backdrop-filter: blur(4px);
   transition:
     background-color var(--dur-base) var(--ease-in-out),
     border-color var(--dur-base) var(--ease-in-out),
@@ -241,7 +224,6 @@ button {
 button:hover:not(:disabled) {
   background: var(--accent);
   color: var(--bg);
-  box-shadow: var(--shadow-glow);
 }
 
 button:active:not(:disabled) {
@@ -262,7 +244,6 @@ button.danger {
 button.danger:hover:not(:disabled) {
   background: var(--danger);
   color: #000;
-  box-shadow: 0 0 20px var(--danger-glow);
 }
 
 button.ghost {
@@ -286,7 +267,7 @@ textarea {
   font-family: var(--font-body);
   font-size: var(--text-base);
   color: var(--text);
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  background: var(--bg);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   transition:
@@ -304,7 +285,6 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 input[type='checkbox'] {
@@ -337,12 +317,7 @@ input[type='checkbox'] {
   color: var(--text-dim);
   text-align: center;
   font-size: var(--text-base);
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  background: var(--surface-2);
   border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(8px);
-}
-
-.mana-glow {
-  text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow);
 }

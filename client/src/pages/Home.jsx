@@ -62,7 +62,7 @@ export default function Home() {
 
   return (
     <div className="page home-page surface">
-      <h1 className="mana-glow">Server Status</h1>
+      <h1>Server Status</h1>
       {error && <div className="error-msg">{error}</div>}
       {notice && <div className="notice-msg">{notice}</div>}
 

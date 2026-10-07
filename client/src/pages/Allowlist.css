@@ -62,7 +62,7 @@
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5);
   border-top: 1px solid var(--border-strong);
-  background: color-mix(in srgb, var(--bg) 25%, transparent);
+  background: var(--bg);
 }
 
 .command-tags {
@@ -92,7 +92,6 @@
   color: var(--danger);
   background: transparent;
   border-color: transparent;
-  backdrop-filter: none;
 }
 
 .command-tag button:hover:not(:disabled) {

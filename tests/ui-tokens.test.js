@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { themes } from "../client/src/theme.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT = path.join(ROOT, "client");
@@ -28,28 +29,6 @@ const definedInRoot = new Set(
 const definedInThemes = new Set(
   [...themeSource.matchAll(/^\s*['"]?(--[a-z0-9-]+)['"]?\s*:/gm)].map((m) => m[1]),
 );
-
-const parseThemes = () => {
-  const themes = {};
-  const body = themeSource.slice(themeSource.indexOf("export const themes = {"));
-  let current = null;
-  for (const line of body.split("\n")) {
-    const header = line.match(/^\s{2}(\w+):\s*\{/);
-    if (header) {
-      current = header[1];
-      themes[current] = {};
-      continue;
-    }
-    const entry = line.match(/^\s{4}['"](--[a-z0-9-]+)['"]:\s*(.+?),?\s*$/);
-    if (entry && current) {
-      let value = entry[2].trim();
-      if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
-      else if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
-      themes[current][entry[1]] = value;
-    }
-  }
-  return themes;
-};
 
 test("every custom property referenced in CSS is defined", () => {
   const referenced = new Map();
@@ -100,16 +79,13 @@ test("every token defined in :root is actually used or intentionally reserved", 
   assert.deepEqual(unused, [], `Unused tokens: ${unused.join(", ")}`);
 });
 
-test("each theme defines the full biome token contract", () => {
-  const themes = parseThemes();
+test("each theme defines the full monochrome token contract", () => {
   const contract = [
     "--bg",
     "--panel",
     "--text",
     "--border",
     "--accent",
-    "--accent-glow",
-    "--signature",
   ];
 
   assert.deepEqual(Object.keys(themes).sort(), ["allowlist", "console", "home", "players", "worlds"]);
@@ -122,7 +98,7 @@ test("each theme defines the full biome token contract", () => {
 });
 
 test("the :root bootstrap fallback mirrors themes.home", () => {
-  const home = parseThemes().home;
+  const home = themes.home;
   const rootValues = Object.fromEntries(
     [...rootBlock.matchAll(/^\s*(--[a-z0-9-]+)\s*:\s*([^;]+);/gm)].map((m) => [m[1], m[2].trim()]),
   );
@@ -138,7 +114,7 @@ test("the :root bootstrap fallback mirrors themes.home", () => {
 });
 
 test("no theme leaks an undefined var() into its own values", () => {
-  for (const [name, values] of Object.entries(parseThemes())) {
+  for (const [name, values] of Object.entries(themes)) {
     for (const [token, value] of Object.entries(values)) {
       assert.ok(!value.includes("var("), `theme "${name}" ${token} contains var(): ${value}`);
     }

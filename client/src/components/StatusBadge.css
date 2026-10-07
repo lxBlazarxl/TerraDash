@@ -9,7 +9,6 @@
   height: 10px;
   flex-shrink: 0;
   border-radius: var(--radius-pill);
-  box-shadow: 0 0 8px currentColor;
 }
 
 .status-label {

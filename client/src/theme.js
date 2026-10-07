@@ -1,59 +1,19 @@
-// client/src/theme.js
-//
-// Biome themes. Each theme supplies ONLY these 7 custom properties; every other
-// token (surfaces, text roles, borders, motion, spacing) is derived from them in
-// index.css, so adding a biome means adding one entry here.
-//
-//   --bg  --panel  --text  --border  --accent  --accent-glow  --signature
-//
-// index.css :root mirrors themes.home as a pre-paint bootstrap fallback;
-// tests/ui-tokens.test.js fails if the two ever drift apart.
+// A single monochrome palette shared by every route.
+// index.css mirrors these values before React mounts.
+const monochrome = {
+  '--bg': '#0a0a0a',
+  '--panel': '#141414',
+  '--text': '#e5e5e5',
+  '--border': '#404040',
+  '--accent': '#ffffff',
+};
+
 export const themes = {
-  home: {
-    '--accent': '#7CFF7C',
-    '--accent-glow': 'rgba(124, 255, 124, 0.3)',
-    '--signature': '#5c8a2e',
-    '--bg': '#0d1f0d',
-    '--panel': '#1a3a1a',
-    '--text': '#e8d5a3',
-    '--border': '#2d5a1a',
-  },
-  worlds: {
-    '--accent': '#FF7CFF',
-    '--accent-glow': 'rgba(255, 124, 255, 0.3)',
-    '--signature': '#c084fc',
-    '--bg': '#1a0d2b',
-    '--panel': '#2d1a1a',
-    '--text': '#e8d5a3',
-    '--border': '#4a1a6b',
-  },
-  players: {
-    '--accent': '#7CFF7C',
-    '--accent-glow': 'rgba(124, 255, 124, 0.3)',
-    '--signature': '#5c8a2e',
-    '--bg': '#050f2b',
-    '--panel': '#0a1f3a',
-    '--text': '#e8d5a3',
-    '--border': '#0a3a5a',
-  },
-  allowlist: {
-    '--accent': '#7CFFFF',
-    '--accent-glow': 'rgba(124, 255, 255, 0.3)',
-    '--signature': '#a8d8ea',
-    '--bg': '#0d1f2b',
-    '--panel': '#1a2f3a',
-    '--text': '#f0f8ff',
-    '--border': '#2a4a5a',
-  },
-  console: {
-    '--accent': '#FF7C7C',
-    '--accent-glow': 'rgba(255, 124, 124, 0.3)',
-    '--signature': '#7c3aed',
-    '--bg': '#05050f',
-    '--panel': '#0d0d1f',
-    '--text': '#e8d5a3',
-    '--border': '#1a0a3a',
-  },
+  home: monochrome,
+  worlds: monochrome,
+  players: monochrome,
+  allowlist: monochrome,
+  console: monochrome,
 };
 
 export const routeThemes = {
