@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import os from "node:os";
 import path from "node:path";
 import { EventEmitter } from "node:events";
 import { mock } from "node:test";
@@ -46,7 +47,13 @@ mock.module("../core/allowlistManager.js", { namedExports: { checkPermission } }
 const tm = await import("../core/terrariaManager.js");
 const TERRARIA_DIR = process.env.TERRARIA_DIR;
 const EXE = path.join(TERRARIA_DIR, "TerrariaServer");
-const WORLDS_DIR = path.join(TERRARIA_DIR, "Worlds");
+const WORLDS_DIR = path.join(
+  os.homedir(),
+  ".local",
+  "share",
+  "Terraria",
+  "Worlds",
+);
 
 const stdout = (text) => currentChild.stdout.emit("data", Buffer.from(text));
 const stdin = () => currentChild.stdinWrites;
@@ -82,9 +89,21 @@ test("listWorlds keeps only .wld files, stripped of extension", () => {
   assert.deepEqual(result, { success: true, worlds: ["World1", "World2"] });
 });
 
-test("listWorlds reports failure when the worlds dir is unreadable", () => {
+test("listWorlds treats a missing worlds dir as an empty list", () => {
+  const missing = new Error("no such file or directory, scandir");
+  missing.code = "ENOENT";
   readdirSync.mock.mockImplementation(() => {
-    throw new Error("ENOENT");
+    throw missing;
+  });
+
+  assert.deepEqual(tm.listWorlds(), { success: true, worlds: [] });
+});
+
+test("listWorlds reports failure when the worlds dir is unreadable", () => {
+  const denied = new Error("permission denied, scandir");
+  denied.code = "EACCES";
+  readdirSync.mock.mockImplementation(() => {
+    throw denied;
   });
 
   assert.equal(tm.listWorlds().success, false);

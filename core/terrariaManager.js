@@ -1,5 +1,6 @@
 import { spawn } from "child_process";
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { checkPermission } from "./allowlistManager.js";
 
@@ -17,13 +18,12 @@ const RESTART_TIMEOUT_MS = 15000;
 
 const TERRARIA_DIR = process.env.TERRARIA_DIR || "";
 const TERRARIA_EXE = process.env.TERRARIA_EXE || "";
-// Worlds may live outside the install dir (on Linux the dedicated server
-// defaults to ~/.local/share/Terraria/Worlds). Allow an explicit override.
+// TerrariaServer always stores worlds in ~/.local/share/Terraria/Worlds on
+// Linux, regardless of where the server files live. Override with
+// TERRARIA_WORLDS_DIR for other platforms or custom setups.
 const WORLDS_DIR =
   process.env.TERRARIA_WORLDS_DIR ||
-  (TERRARIA_DIR
-    ? path.join(TERRARIA_DIR, "Worlds")
-    : path.join(process.cwd(), "Worlds"));
+  path.join(os.homedir(), ".local", "share", "Terraria", "Worlds");
 
 const isConfigured = () => Boolean(TERRARIA_DIR && TERRARIA_EXE);
 
@@ -334,9 +334,12 @@ export const deleteWorld = async (worldName) => {
   }
 };
 
+let worldsDirMissing = false;
+
 export const listWorlds = () => {
   try {
     const files = fs.readdirSync(WORLDS_DIR);
+    worldsDirMissing = false;
 
     const worlds = files
       .filter((file) => file.endsWith(".wld"))
@@ -347,6 +350,17 @@ export const listWorlds = () => {
 
     return { success: true, worlds };
   } catch (error) {
+    // A fresh install has no Worlds directory until the first world is
+    // created; report an empty list instead of an error.
+    if (error.code === "ENOENT") {
+      if (!worldsDirMissing) {
+        worldsDirMissing = true;
+        console.warn(
+          `[Manager] Worlds directory does not exist yet: ${WORLDS_DIR}. Reporting no worlds.`,
+        );
+      }
+      return { success: true, worlds: [] };
+    }
     console.error("[Manager] Error reading worlds directory:", error);
     return { success: false, worlds: [], message: "Failed to read worlds directory." };
   }

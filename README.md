@@ -48,7 +48,7 @@ This project acts as a wrapper around the standalone Terraria server executable.
 
 ## 3. Fetching / Updating the Terraria Server
 
-The repository ships with an updater script that queries terraria.org for the latest dedicated server version, downloads it, and installs it into `terraria/` inside the project (existing `Worlds/` are preserved):
+The repository ships with an updater script that queries terraria.org for the latest dedicated server version, downloads it, and installs it into `terraria/` inside the project:
 
 ```bash
 npm run server:update
